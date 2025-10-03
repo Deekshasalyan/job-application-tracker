@@ -1,0 +1,13 @@
+# Dependencies and Generated Files
+
+/node_modules
+/package-lock.json
+
+# Environment Variables and Secrets (CRITICAL SECURITY RISK if uploaded!)
+
+/server/.env
+
+# Logs and Debugging Files
+
+npm-debug.log*
+.DS_Store
