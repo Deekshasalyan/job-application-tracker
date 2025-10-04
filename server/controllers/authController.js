@@ -54,6 +54,42 @@ const register = asyncHandler(async (req, res) => {
     }
 });
 
+// /**
+//  * @desc    Authenticate user & get token
+//  * @route   POST /api/v1/auth/login
+//  * @access  Public
+//  */
+// const login = asyncHandler(async (req, res) => {
+//     const { email, password } = req.body;
+
+//     // 1. Basic validation
+//     if (!email || !password) {
+//         res.status(400);
+//         throw new Error('Please provide email and password.');
+//     }
+
+//     // 2. Check for user email in database
+//     const user = await User.findOne({ email });
+
+//     // DEBUG: show whether user was found (do not log passwords)
+//     console.debug('[auth] login attempt for:', email, 'userFound:', !!user);
+
+//     // 3. Check password using the matchPassword method in User.js
+//     const isMatch = user ? await user.matchPassword(password) : false;
+//     console.debug('[auth] password match:', isMatch);
+
+//     if (user && isMatch) {
+//         res.json({
+//             _id: user._id,
+//             name: user.name,
+//             email: user.email,
+//             token: createJWT(user._id),
+//         });
+//     } else {
+//         res.status(401); // Unauthorized
+//         throw new Error('Invalid credentials');
+//     }
+// });
 /**
  * @desc    Authenticate user & get token
  * @route   POST /api/v1/auth/login
@@ -68,11 +104,18 @@ const login = asyncHandler(async (req, res) => {
         throw new Error('Please provide email and password.');
     }
 
-    // 2. Check for user email in database
-    const user = await User.findOne({ email });
+    // 2. FIND THE USER AND EXPLICITLY SELECT THE PASSWORD HASH
+    // This returns a Mongoose Document instance, allowing matchPassword to work.
+    const user = await User.findOne({ email }).select('+password'); // <--- ADDED .select('+password')
 
     // 3. Check password using the matchPassword method in User.js
     if (user && (await user.matchPassword(password))) {
+        // ... (rest of the successful login logic)
+        // ... (Remember to exclude the password before sending the response)
+        
+        // Remove password from the user object before sending it back
+        user.password = undefined; 
+        
         res.json({
             _id: user._id,
             name: user.name,
@@ -84,7 +127,6 @@ const login = asyncHandler(async (req, res) => {
         throw new Error('Invalid credentials');
     }
 });
-
 /**
  * @desc    Get the currently logged-in user data
  * @route   GET /api/v1/auth/currentUser

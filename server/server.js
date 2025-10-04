@@ -46,6 +46,29 @@ dotenv.config(); // Load environment variables from .env
 const app = express();
 connectDB(); // Execute the database connection
 
+// Ensure a development JWT secret exists (do not use in production)
+if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'dev_jwt_secret_please_change';
+}
+
+// Global error handlers to capture unexpected crashes and promise rejections
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception - shutting down gracefully');
+    console.error(err && err.stack ? err.stack : err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('beforeExit', (code) => {
+    console.log('Process beforeExit event with code:', code);
+});
+
+process.on('exit', (code) => {
+    console.log('Process exit event with code:', code);
+});
+
 // --- Built-in Middleware ---
 app.use(express.json()); // Allows server to accept JSON data in the request body
 

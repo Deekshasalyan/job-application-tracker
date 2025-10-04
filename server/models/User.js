@@ -36,6 +36,7 @@
 
 // module.exports = mongoose.model('User', userSchema);
 import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -50,10 +51,29 @@ const UserSchema = new mongoose.Schema({
     lowercase: true,
     trim: true,
   },
-  password: {
-    type: String,
-    required: [true, 'Please provide a password'],
-  },
+//   password: {
+//     type: String,
+//     required: [true, 'Please provide a password'],
+//   },
+    password: {
+        type: String,
+        required: true,
+        select: false, // This is the likely culprit!
+    },
+
 }, { timestamps: true }); // Adds createdAt and updatedAt automatically
+
+// Hash password before saving
+UserSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+// Instance method to compare entered password with hashed password
+UserSchema.methods.matchPassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
+};
 
 export default mongoose.model('User', UserSchema);
