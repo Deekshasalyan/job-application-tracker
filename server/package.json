@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Job Application Tracker Backend built with Node.js, Express, and MongoDB (Mongoose).",
   "main": "server/server.js",
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "start": "nodemon server/server.js",
     "dev": "nodemon server/server.js",
@@ -22,11 +22,13 @@
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.21.2",
+    "express-async-errors": "^3.1.1",
     "express-async-handler": "^1.2.0",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.1.0",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.20.0",
     "mongoose": "^8.19.0"
   },
   "devDependencies": {
